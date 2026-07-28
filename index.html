@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sandrini Lignea — Painel de Gestão</title>
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#4B5A3C" />
+<link rel="icon" href="icons/icon-192.png" />
+<link rel="apple-touch-icon" href="icons/icon-192.png" />
+<style>
+  :root{
+    --moss:#4B5A3C;
+    --moss-dark:#39442D;
+    --wood:#8B5A34;
+    --wood-dark:#6B4423;
+    --copper:#C17F45;
+    --cream:#F6F2EA;
+    --paper:#FFFFFF;
+    --ink:#2E2A22;
+    --ink-soft:#6B6558;
+    --line:#DDD5C3;
+    --danger:#A6432F;
+    --ok:#4B5A3C;
+    --warn:#B8863E;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--cream);
+    color:var(--ink);
+    font-family:"Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{
+    font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif;
+    margin:0;
+  }
+  header.top{
+    position:relative;
+    padding:34px 28px 26px;
+    background:linear-gradient(180deg, var(--moss) 0%, var(--moss-dark) 100%);
+    color:#F3EFE3;
+    overflow:hidden;
+  }
+  header.top .rings{
+    position:absolute;
+    right:-40px;
+    top:-40px;
+    width:220px;
+    height:220px;
+    border-radius:50%;
+    background:
+      repeating-radial-gradient(circle at center,
+        rgba(255,255,255,0.06) 0px,
+        rgba(255,255,255,0.06) 3px,
+        transparent 3px,
+        transparent 12px);
+    opacity:0.9;
+    pointer-events:none;
+  }
+  header.top .brand{
+    font-size:26px;
+    letter-spacing:0.5px;
+    font-weight:700;
+  }
+  header.top .tagline{
+    font-family:Georgia,serif;
+    font-style:italic;
+    font-size:14px;
+    color:#D9E0CC;
+    margin-top:4px;
+  }
+  nav.tabs{
+    display:flex;
+    gap:4px;
+    padding:10px 20px 0;
+    background:var(--moss-dark);
+    overflow-x:auto;
+  }
+  nav.tabs button{
+    appearance:none;
+    border:none;
+    background:transparent;
+    color:#D9E0CC;
+    padding:12px 18px;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    border-radius:8px 8px 0 0;
+    white-space:nowrap;
+    transition:background .15s ease, color .15s ease;
+  }
+  nav.tabs button:hover{ background:rgba(255,255,255,0.08); }
+  nav.tabs button.active{
+    background:var(--cream);
+    color:var(--moss-dark);
+  }
+  main{
+    max-width:980px;
+    margin:0 auto;
+    padding:24px 20px 60px;
+  }
+  .cards-row{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(200px,1fr));
+    gap:14px;
+    margin-bottom:22px;
+  }
+  .card{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:16px 18px;
+    box-shadow:0 1px 2px rgba(0,0,0,0.03);
+  }
+  .card .label{
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:0.6px;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .card .value{
+    font-family:Georgia,serif;
+    font-size:26px;
+    font-weight:700;
+    color:var(--moss-dark);
+  }
+  .card .sub{
+    font-size:12px;
+    color:var(--ink-soft);
+    margin-top:4px;
+  }
+  section.panel{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:20px;
+    margin-bottom:20px;
+  }
+  section.panel h2{
+    font-size:18px;
+    color:var(--moss-dark);
+    margin-bottom:14px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .btn{
+    appearance:none;
+    border:none;
+    border-radius:8px;
+    padding:9px 14px;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+    transition:filter .12s ease, transform .05s ease;
+  }
+  .btn:active{ transform:translateY(1px); }
+  .btn-primary{ background:var(--copper); color:#fff; }
+  .btn-primary:hover{ filter:brightness(1.06); }
+  .btn-ghost{ background:transparent; color:var(--moss-dark); border:1px solid var(--line); }
+  .btn-ghost:hover{ background:var(--cream); }
+  .btn-danger{ background:transparent; color:var(--danger); border:1px solid #E7C9C1; }
+  .btn-danger:hover{ background:#FBEFEC; }
+  .btn-sm{ padding:6px 10px; font-size:12px; }
+
+  table{ width:100%; border-collapse:collapse; font-size:14px; }
+  th{
+    text-align:left;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    color:var(--ink-soft);
+    padding:8px 10px;
+    border-bottom:2px solid var(--line);
+  }
+  td{
+    padding:10px 10px;
+    border-bottom:1px solid var(--line);
+    vertical-align:middle;
+  }
+  tr:last-child td{ border-bottom:none; }
+  .tag{
+    display:inline-block;
+    padding:3px 9px;
+    border-radius:20px;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:0.3px;
+  }
+  .tag-socio{ background:#E4E9DC; color:var(--moss-dark); }
+  .tag-funcionario{ background:#EFE3D3; color:var(--wood-dark); }
+  .tag-planejado{ background:#F3E7CE; color:var(--warn); }
+  .status-orcamento{ background:#F3E7CE; color:var(--warn); }
+  .status-andamento{ background:#DCE7F5; color:#33547A; }
+  .status-concluida{ background:#E4E9DC; color:var(--moss-dark); }
+
+  form.inline{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+    gap:10px;
+    margin-top:14px;
+    padding-top:14px;
+    border-top:1px dashed var(--line);
+  }
+  form.inline label{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.4px;
+    color:var(--ink-soft);
+    display:block;
+    margin-bottom:4px;
+  }
+  form.inline input, form.inline select{
+    width:100%;
+    padding:8px 9px;
+    border:1px solid var(--line);
+    border-radius:7px;
+    font-size:13px;
+    font-family:inherit;
+    background:#FCFBF8;
+  }
+  form.inline .full{ grid-column:1 / -1; }
+  form.inline .actions{
+    grid-column:1 / -1;
+    display:flex;
+    gap:8px;
+    margin-top:4px;
+  }
+  .empty{
+    padding:30px 10px;
+    text-align:center;
+    color:var(--ink-soft);
+    font-size:14px;
+  }
+  .agenda-item{
+    display:flex;
+    gap:14px;
+    padding:12px 4px;
+    border-bottom:1px solid var(--line);
+    align-items:flex-start;
+  }
+  .agenda-item:last-child{ border-bottom:none; }
+  .agenda-date{
+    min-width:64px;
+    text-align:center;
+    background:var(--cream);
+    border-radius:8px;
+    padding:6px 4px;
+    font-family:Georgia,serif;
+  }
+  .agenda-date .d{ font-size:18px; font-weight:700; color:var(--moss-dark); line-height:1; }
+  .agenda-date .m{ font-size:10px; text-transform:uppercase; color:var(--ink-soft); }
+  .agenda-body{ flex:1; }
+  .agenda-body .t{ font-weight:700; font-size:14px; }
+  .agenda-body .meta{ font-size:12px; color:var(--ink-soft); margin-top:2px; }
+  .row-actions{ display:flex; gap:6px; }
+  .toast{
+    position:fixed;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%);
+    background:var(--moss-dark);
+    color:#fff;
+    padding:10px 18px;
+    border-radius:20px;
+    font-size:13px;
+    opacity:0;
+    transition:opacity .25s ease;
+    pointer-events:none;
+    z-index:50;
+  }
+  .toast.show{ opacity:1; }
+  .footer-note{
+    text-align:center;
+    font-size:12px;
+    color:var(--ink-soft);
+    margin-top:10px;
+  }
+  .link-btn{
+    background:none;border:none;color:var(--moss-dark);text-decoration:underline;cursor:pointer;font-size:12px;padding:0;
+  }
+  .equipe-box{
+    grid-column:1/-1;
+    border:1px dashed var(--line);
+    border-radius:10px;
+    padding:12px;
+    background:#FCFBF8;
+  }
+  .equipe-box .title{
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:0.4px;
+    color:var(--ink-soft);
+    margin-bottom:8px;
+  }
+  .equipe-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:8px;
+    align-items:center;
+  }
+  .equipe-row select{ flex:2 1 140px; }
+  .equipe-row input{ flex:1 1 90px; }
+  .equipe-row select, .equipe-row input{
+    padding:7px 8px;
+    border:1px solid var(--line);
+    border-radius:7px;
+    font-size:13px;
+    background:#fff;
+  }
+  .item-row, .pagamento-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    align-items:center;
+    margin-bottom:8px;
+    padding-bottom:8px;
+    border-bottom:1px dashed var(--line);
+  }
+  .item-row input, .item-row select,
+  .pagamento-row input, .pagamento-row select{
+    padding:6px 8px;
+    border:1px solid var(--line);
+    border-radius:7px;
+    font-size:12px;
+    background:#fff;
+  }
+  .item-row .item-servico{ flex:2 1 140px; }
+  .item-row .item-m2{ flex:1 1 70px; }
+  .item-row .item-valorm2{ flex:1 1 90px; }
+  .item-row .item-subtotal{ flex:0 0 auto; font-weight:700; color:var(--moss-dark); font-size:13px; min-width:80px; }
+  .item-row{
+    display:grid;
+    grid-template-columns:1.4fr 80px 100px 90px auto;
+    gap:8px;
+    margin-bottom:8px;
+    align-items:center;
+  }
+  .item-row select, .item-row input{
+    padding:7px 8px;
+    border:1px solid var(--line);
+    border-radius:7px;
+    font-size:13px;
+    background:#fff;
+  }
+  .valor-total-box{
+    grid-column:1/-1;
+    background:var(--cream);
+    border-radius:10px;
+    padding:10px 14px;
+    font-size:14px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .valor-total-box .amount{
+    font-family:Georgia,serif;
+    font-size:20px;
+    font-weight:700;
+    color:var(--moss-dark);
+  }
+  .chip{
+    display:inline-block;
+    background:var(--cream);
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:2px 9px;
+    font-size:11px;
+    margin:1px 3px 1px 0;
+    color:var(--ink);
+  }
+  .backup-bar{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:10px;
+    padding:10px 20px;
+    background:#EFEADE;
+    border-bottom:1px solid var(--line);
+  }
+  .backup-hint{
+    font-size:11px;
+    color:var(--ink-soft);
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="rings"></div>
+  <div class="brand">Sandrini Lignea</div>
+  <div class="tagline">Da floresta ao seu lar — Painel de Gestão</div>
+</header>
+
+<nav class="tabs" id="tabs"></nav>
+<div class="backup-bar">
+  <button id="btn-export" class="btn btn-ghost btn-sm">⬇ Baixar backup</button>
+  <label class="btn btn-ghost btn-sm" style="cursor:pointer;margin:0;">
+    ⬆ Restaurar backup
+    <input type="file" id="input-import" accept="application/json" style="display:none;" />
+  </label>
+  <span class="backup-hint">Salve um backup sempre que fizer alterações importantes — garante que você não perde nada.</span>
+</div>
+<main id="content"></main>
+<div class="toast" id="toast"></div>
+
+<script>
+const KEYS = { funcionarios: "funcionarios", obras: "obras", agenda: "agenda", servicos: "servicos" };
+
+let state = {
+  activeTab: "resumo",
+  funcionarios: [],
+  obras: [],
+  agenda: [],
+  servicos: [],
+  loading: true,
+  formOpen: { funcionarios: false, obras: false, agenda: false, servicos: false },
+  editing: { funcionarios: null, obras: null, agenda: null, servicos: null },
+  obraDraft: null,
+};
+
+const fmtMoney = (v) => (Number(v) || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+const monthsPt = ["JAN","FEV","MAR","ABR","MAI","JUN","JUL","AGO","SET","OUT","NOV","DEZ"];
+function parseNum(v){ return parseFloat(String(v==null?'':v).replace(',', '.').trim()) || 0; }
+
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(()=> t.classList.remove("show"), 2200);
+}
+
+// ---------- IndexedDB storage (standalone, works offline, no external dependency) ----------
+const DB_NAME = "sandrini_lignea_db";
+const STORE_NAME = "kv";
+let dbPromise = null;
+
+function openDB(){
+  if(dbPromise) return dbPromise;
+  dbPromise = new Promise((resolve, reject)=>{
+    const req = indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = ()=>{
+      req.result.createObjectStore(STORE_NAME);
+    };
+    req.onsuccess = ()=> resolve(req.result);
+    req.onerror = ()=> reject(req.error);
+  });
+  return dbPromise;
+}
+
+async function loadList(key, seed){
+  try{
+    const db = await openDB();
+    return await new Promise((resolve)=>{
+      const tx = db.transaction(STORE_NAME, "readonly");
+      const req = tx.objectStore(STORE_NAME).get(key);
+      req.onsuccess = ()=>{
+        if(req.result){
+          try{ resolve(JSON.parse(req.result)); }
+          catch(e){ resolve(seed || []); }
+        }else{
+          resolve(seed || []);
+        }
+      };
+      req.onerror = ()=> resolve(seed || []);
+    });
+  }catch(e){
+    return seed || [];
+  }
+}
+async function saveList(key, arr){
+  try{
+    const db = await openDB();
+    return await new Promise((resolve)=>{
+      const tx = db.transaction(STORE_NAME, "readwrite");
+      tx.objectStore(STORE_NAME).put(JSON.stringify(arr), key);
+      tx.oncomplete = ()=> resolve(true);
+      tx.onerror = ()=>{ showToast("Não foi possível salvar. Tente novamente."); resolve(false); };
+    });
+  }catch(e){
+    showToast("Erro ao salvar: " + (e.message || e));
+    return false;
+  }
+}
+
+const seedFuncionarios = [
+  { id: "f1", nome: "Você", tipo: "Sócio", valor: 3000, status: "Ativo", obs: "Pró-labore fixo" },
+  { id: "f2", nome: "Sócio 2", tipo: "Sócio", valor: 1500, status: "Ativo", obs: "Pró-labore fixo" },
+  { id: "f3", nome: "Sócio 3", tipo: "Sócio", valor: 1800, status: "Ativo", obs: "Pró-labore fixo" },
+  { id: "f4", nome: "Auxiliar de Carpintaria", tipo: "Funcionário", valor: 1800, status: "Planejado", obs: "Piso a confirmar (Siticom/Sinduscon Florianópolis)" },
+];
+
+const seedServicos = [
+  { id: "s1", nome: "Piso de madeira", valorM2: 0 },
+  { id: "s2", nome: "Deck", valorM2: 0 },
+  { id: "s3", nome: "Forro", valorM2: 0 },
+];
+
+function uid(){ return Math.random().toString(36).slice(2,9); }
+
+function exportBackup(){
+  const backup = {
+    funcionarios: state.funcionarios,
+    servicos: state.servicos,
+    obras: state.obras,
+    agenda: state.agenda,
+    exportadoEm: new Date().toISOString(),
+  };
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `sandrini-lignea-backup-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  showToast("Backup baixado.");
+}
+
+function importBackup(file){
+  const reader = new FileReader();
+  reader.onload = async ()=>{
+    try{
+      const data = JSON.parse(reader.result);
+      state.funcionarios = data.funcionarios || state.funcionarios;
+      state.servicos = data.servicos || state.servicos;
+      state.obras = data.obras || state.obras;
+      state.agenda = data.agenda || state.agenda;
+      await saveList(KEYS.funcionarios, state.funcionarios);
+      await saveList(KEYS.servicos, state.servicos);
+      await saveList(KEYS.obras, state.obras);
+      await saveList(KEYS.agenda, state.agenda);
+      showToast("Backup restaurado.");
+      render();
+    }catch(e){
+      showToast("Arquivo inválido — não foi possível restaurar.");
+    }
+  };
+  reader.readAsText(file);
+}
+
+async function init(){
+  state.funcionarios = await loadList(KEYS.funcionarios, seedFuncionarios);
+  state.obras = await loadList(KEYS.obras, []);
+  state.agenda = await loadList(KEYS.agenda, []);
+  state.servicos = await loadList(KEYS.servicos, seedServicos);
+  state.loading = false;
+  render();
+  const btnExport = document.getElementById("btn-export");
+  if(btnExport) btnExport.addEventListener("click", exportBackup);
+  const inputImport = document.getElementById("input-import");
+  if(inputImport) inputImport.addEventListener("change", (e)=>{
+    if(e.target.files && e.target.files[0]) importBackup(e.target.files[0]);
+    e.target.value = '';
+  });
+}
+
+// ---------- TABS ----------
+const TABS = [
+  { id: "resumo", label: "Resumo" },
+  { id: "funcionarios", label: "Funcionários" },
+  { id: "servicos", label: "Serviços" },
+  { id: "obras", label: "Obras" },
+  { id: "agenda", label: "Agenda" },
+];
+
+function renderTabs(){
+  const nav = document.getElementById("tabs");
+  nav.innerHTML = TABS.map(t =>
+    `<button data-tab="${t.id}" class="${state.activeTab===t.id?'active':''}">${t.label}</button>`
+  ).join("");
+  nav.querySelectorAll("button").forEach(b=>{
+    b.addEventListener("click", ()=>{ state.activeTab = b.dataset.tab; render(); });
+  });
+}
+
+// ---------- RESUMO ----------
+function renderResumo(){
+  const totalFolha = state.funcionarios.filter(f=>f.status!=="Planejado").reduce((s,f)=>s+Number(f.valor||0),0);
+  const totalPlanejado = state.funcionarios.filter(f=>f.status==="Planejado").reduce((s,f)=>s+Number(f.valor||0),0);
+  const obrasAtivas = state.obras.filter(o=>o.status==="Em andamento").length;
+  const obrasOrcamento = state.obras.filter(o=>o.status==="Orçamento").length;
+  const valorObrasAtivas = state.obras.filter(o=>o.status==="Em andamento").reduce((s,o)=>s+Number(o.valorTotal||0),0);
+
+  const now = new Date();
+  const currentKey = monthKey(now);
+  const events = allPaymentEvents();
+  const recebidoMes = events.filter(e=>e.pago && monthKey(e.date)===currentKey).reduce((s,e)=>s+e.valor,0);
+
+  const proximosMeses = [];
+  for(let i=0;i<4;i++){
+    const ref = new Date(now.getFullYear(), now.getMonth()+i, 1);
+    const key = monthKey(ref);
+    const valor = events.filter(e=>!e.pago && monthKey(e.date)===key).reduce((s,e)=>s+e.valor,0);
+    proximosMeses.push({ label: monthLabel(ref), valor, atual: i===0 });
+  }
+
+  const proximos = [...state.agenda]
+    .filter(a=> new Date(a.data + "T" + (a.hora||"00:00")) >= new Date(now.getFullYear(),now.getMonth(),now.getDate()))
+    .sort((a,b)=> new Date(a.data+"T"+(a.hora||"00:00")) - new Date(b.data+"T"+(b.hora||"00:00")))
+    .slice(0,4);
+
+  return `
+    <div class="cards-row">
+      <div class="card">
+        <div class="label">Folha mensal (ativos)</div>
+        <div class="value">${fmtMoney(totalFolha)}</div>
+        <div class="sub">${totalPlanejado>0 ? "+ "+fmtMoney(totalPlanejado)+" planejado" : "Sócios + funcionários ativos"}</div>
+      </div>
+      <div class="card">
+        <div class="label">Recebido este mês</div>
+        <div class="value">${fmtMoney(recebidoMes)}</div>
+        <div class="sub">Com base nos pagamentos marcados como recebidos</div>
+      </div>
+      <div class="card">
+        <div class="label">Obras em andamento</div>
+        <div class="value">${obrasAtivas}</div>
+        <div class="sub">${fmtMoney(valorObrasAtivas)} em valor contratado</div>
+      </div>
+      <div class="card">
+        <div class="label">Orçamentos em aberto</div>
+        <div class="value">${obrasOrcamento}</div>
+        <div class="sub">Aguardando aprovação do cliente</div>
+      </div>
+    </div>
+
+    <section class="panel">
+      <h2>Projeção de recebimentos</h2>
+      <div style="font-size:12px;color:var(--ink-soft);margin-bottom:12px;">
+        Baseada nas datas informadas na forma de pagamento de cada obra (entrada, saldo ou parcelas ainda não marcadas como recebidas).
+      </div>
+      <div class="cards-row">
+        ${proximosMeses.map(m=>`
+          <div class="card" style="${m.atual?'border-color:var(--copper);':''}">
+            <div class="label">${m.atual?'Este mês':m.label}</div>
+            <div class="value" style="font-size:20px;">${fmtMoney(m.valor)}</div>
+            ${m.atual? `<div class="sub">Ainda a receber em ${m.label}</div>` : ''}
+          </div>
+        `).join("")}
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Próximos compromissos</h2>
+      ${proximos.length ? proximos.map(a=>agendaItemHtml(a)).join("") : `<div class="empty">Nenhum compromisso futuro cadastrado. Adicione na aba Agenda.</div>`}
+    </section>
+
+    <section class="panel">
+      <h2>Equipe</h2>
+      ${funcionariosTableHtml(false)}
+    </section>
+  `;
+}
+
+// ---------- FUNCIONÁRIOS ----------
+function funcionariosTableHtml(withActions){
+  if(!state.funcionarios.length) return `<div class="empty">Nenhum funcionário cadastrado ainda.</div>`;
+  const rows = state.funcionarios.map(f=>`
+    <tr data-id="${f.id}">
+      <td>${f.nome}</td>
+      <td><span class="tag ${f.tipo==='Sócio'?'tag-socio':'tag-funcionario'}">${f.tipo}</span></td>
+      <td>${fmtMoney(f.valor)}</td>
+      <td>${f.status==='Planejado' ? `<span class="tag tag-planejado">Planejado</span>` : f.status}</td>
+      <td style="color:var(--ink-soft); font-size:12px;">${f.obs||''}</td>
+      ${withActions ? `<td class="row-actions">
+        <button class="link-btn" data-action="edit-func" data-id="${f.id}">editar</button>
+        <button class="link-btn" data-action="del-func" data-id="${f.id}" style="color:var(--danger)">remover</button>
+      </td>` : ''}
+    </tr>
+  `).join("");
+  const total = state.funcionarios.reduce((s,f)=>s+Number(f.valor||0),0);
+  return `
+    <table>
+      <thead><tr>
+        <th>Nome</th><th>Tipo</th><th>Valor fixo/mês</th><th>Status</th><th>Observação</th>${withActions?'<th></th>':''}
+      </tr></thead>
+      <tbody>${rows}</tbody>
+      <tfoot><tr>
+        <td colspan="2" style="font-weight:700;">Total</td>
+        <td style="font-weight:700;">${fmtMoney(total)}</td>
+        <td colspan="${withActions?3:2}"></td>
+      </tr></tfoot>
+    </table>
+  `;
+}
+
+function funcionarioFormHtml(){
+  const ed = state.editing.funcionarios;
+  const f = ed ? state.funcionarios.find(x=>x.id===ed) : null;
+  return `
+    <form class="inline" id="form-func">
+      <div>
+        <label>Nome</label>
+        <input name="nome" required value="${f?f.nome:''}" />
+      </div>
+      <div>
+        <label>Tipo</label>
+        <select name="tipo">
+          <option ${f&&f.tipo==='Sócio'?'selected':''}>Sócio</option>
+          <option ${f&&f.tipo==='Funcionário'?'selected':''}>Funcionário</option>
+        </select>
+      </div>
+      <div>
+        <label>Valor fixo mensal (R$)</label>
+        <input name="valor" type="text" inputmode="decimal" required value="${f?f.valor:''}" placeholder="ex: 1800 ou 1800,50" />
+      </div>
+      <div>
+        <label>Status</label>
+        <select name="status">
+          <option ${f&&f.status==='Ativo'?'selected':''}>Ativo</option>
+          <option ${f&&f.status==='Planejado'?'selected':''}>Planejado</option>
+          <option ${f&&f.status==='Inativo'?'selected':''}>Inativo</option>
+        </select>
+      </div>
+      <div class="full">
+        <label>Observação</label>
+        <input name="obs" value="${f?(f.obs||''):''}" />
+      </div>
+      <div class="actions">
+        <button type="submit" class="btn btn-primary">${f?'Salvar alterações':'Adicionar'}</button>
+        <button type="button" class="btn btn-ghost" id="cancel-func">Cancelar</button>
+      </div>
+    </form>
+  `;
+}
+
+function renderFuncionarios(){
+  return `
+    <section class="panel">
+      <h2>Funcionários e Sócios
+        ${!state.formOpen.funcionarios ? `<button class="btn btn-primary btn-sm" id="add-func">+ Adicionar</button>` : ''}
+      </h2>
+      ${funcionariosTableHtml(true)}
+      ${state.formOpen.funcionarios ? funcionarioFormHtml() : ''}
+    </section>
+  `;
+}
+
+// ---------- SERVIÇOS ----------
+function servicosTableHtml(){
+  if(!state.servicos.length) return `<div class="empty">Nenhum serviço cadastrado ainda.</div>`;
+  const rows = state.servicos.map(s=>`
+    <tr data-id="${s.id}">
+      <td>${s.nome}</td>
+      <td>${fmtMoney(s.valorM2)} / m²</td>
+      <td class="row-actions">
+        <button class="link-btn" data-action="edit-servico" data-id="${s.id}">editar</button>
+        <button class="link-btn" data-action="del-servico" data-id="${s.id}" style="color:var(--danger)">remover</button>
+      </td>
+    </tr>
+  `).join("");
+  return `
+    <table>
+      <thead><tr><th>Serviço</th><th>Valor por m²</th><th></th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+}
+function servicoFormHtml(){
+  const ed = state.editing.servicos;
+  const s = ed ? state.servicos.find(x=>x.id===ed) : null;
+  return `
+    <form class="inline" id="form-servico">
+      <div>
+        <label>Nome do serviço</label>
+        <input name="nome" required value="${s?s.nome:''}" />
+      </div>
+      <div>
+        <label>Valor por m² (R$)</label>
+        <input name="valorM2" type="text" inputmode="decimal" required value="${s?s.valorM2:''}" placeholder="ex: 85 ou 85,50" />
+      </div>
+      <div class="actions">
+        <button type="submit" class="btn btn-primary">${s?'Salvar alterações':'Adicionar serviço'}</button>
+        <button type="button" class="btn btn-ghost" id="cancel-servico">Cancelar</button>
+      </div>
+    </form>
+  `;
+}
+function renderServicos(){
+  return `
+    <section class="panel">
+      <h2>Valores por Serviço
+        ${!state.formOpen.servicos ? `<button class="btn btn-primary btn-sm" id="add-servico">+ Adicionar serviço</button>` : ''}
+      </h2>
+      <div style="font-size:13px;color:var(--ink-soft);margin-bottom:10px;">
+        Cadastre aqui o valor por m² de cada serviço. Na aba Obras, basta escolher o serviço e informar o tamanho — o valor total é calculado automaticamente.
+      </div>
+      ${servicosTableHtml()}
+      ${state.formOpen.servicos ? servicoFormHtml() : ''}
+    </section>
+  `;
+}
+
+// ---------- OBRAS ----------
+function statusClass(s){
+  if(s==="Orçamento") return "status-orcamento";
+  if(s==="Em andamento") return "status-andamento";
+  return "status-concluida";
+}
+function pagamentoResumo(o){
+  const p = o.pagamento;
+  if(!p) return '—';
+  const total = o.valorTotal || 0;
+  if(p.tipo === "avista"){
+    return p.pago ? `<span class="tag status-concluida">Pago à vista</span>` : `<span class="tag status-orcamento">À vista · pendente</span>`;
+  }
+  if(p.tipo === "entrada_saldo"){
+    const entrada = total * (Number(p.entradaPercentual)||0) / 100;
+    return `Entrada ${p.entradaPercentual}% (${fmtMoney(entrada)}) ${p.entradaPaga?'✓':'pendente'}<br/>Saldo ${p.saldoPago?'✓ recebido':'pendente'}`;
+  }
+  const n = Math.max(1, parseInt(p.numParcelas)||1);
+  return `${p.parcelasPagas||0}/${n} parcelas pagas`;
+}
+function obrasTableHtml(){
+  if(!state.obras.length) return `<div class="empty">Nenhuma obra cadastrada ainda.</div>`;
+  const rows = [...state.obras].sort((a,b)=> new Date(b.dataInicio||0) - new Date(a.dataInicio||0)).map(o=>{
+    const itensChips = (o.itens||[]).map(it=>{
+      const serv = state.servicos.find(s=>s.id===it.servicoId);
+      return serv ? `<span class="chip">${serv.nome} · ${it.m2||0}m²</span>` : '';
+    }).join("");
+    const totalM2 = (o.itens||[]).reduce((s,it)=>s+(Number(it.m2)||0),0);
+    const equipeNomes = (o.equipe||[]).map(eq=>{
+      const f = state.funcionarios.find(x=>x.id===eq.funcionarioId);
+      return f ? `<span class="chip">${f.nome} · ${fmtMoney(eq.valorM2)}/m²</span>` : '';
+    }).join("");
+    return `
+    <tr data-id="${o.id}">
+      <td>${o.cliente}</td>
+      <td style="font-size:12px;color:var(--ink-soft);">${o.endereco||''}</td>
+      <td>${itensChips || '—'}</td>
+      <td>${totalM2 ? totalM2+' m²' : '—'}</td>
+      <td>${fmtMoney(o.valorTotal)}</td>
+      <td>${equipeNomes || '<span style="color:var(--ink-soft);font-size:12px;">—</span>'}</td>
+      <td style="font-size:12px;">${pagamentoResumo(o)}</td>
+      <td><span class="tag ${statusClass(o.status)}">${o.status}</span></td>
+      <td style="font-size:12px;">${o.dataInicio?formatDateShort(o.dataInicio):'—'}</td>
+      <td style="font-size:12px;">${o.dataFim?formatDateShort(o.dataFim):'—'}</td>
+      <td class="row-actions">
+        <button class="link-btn" data-action="edit-obra" data-id="${o.id}">editar</button>
+        <button class="link-btn" data-action="del-obra" data-id="${o.id}" style="color:var(--danger)">remover</button>
+      </td>
+    </tr>
+  `;}).join("");
+  return `
+    <table>
+      <thead><tr>
+        <th>Cliente</th><th>Endereço</th><th>Serviços</th><th>m² total</th><th>Valor total</th><th>Equipe</th><th>Pagamento</th><th>Status</th><th>Início</th><th>Previsão</th><th></th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+}
+function addMonths(dateStr, n){
+  const d = new Date(dateStr+"T00:00:00");
+  d.setMonth(d.getMonth()+n);
+  return d;
+}
+function monthKey(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
+function monthLabel(d){ return `${monthsPt[d.getMonth()]}/${d.getFullYear()}`; }
+function formatDateShort(iso){
+  if(!iso) return '';
+  const d = new Date(iso+"T00:00:00");
+  return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+}
+
+function obraPaymentEvents(o){
+  const total = o.valorTotal||0;
+  const p = o.pagamento;
+  if(!p) return [];
+  if(p.tipo==="avista"){
+    if(!p.dataPagamento) return [];
+    return [{ valor: total, date: new Date(p.dataPagamento+"T00:00:00"), pago: !!p.pago }];
+  }
+  if(p.tipo==="entrada_saldo"){
+    const entrada = total * (Number(p.entradaPercentual)||0) / 100;
+    const saldo = total - entrada;
+    const evs = [];
+    if(p.dataEntrada) evs.push({ valor: entrada, date: new Date(p.dataEntrada+"T00:00:00"), pago: !!p.entradaPaga });
+    if(p.dataSaldo) evs.push({ valor: saldo, date: new Date(p.dataSaldo+"T00:00:00"), pago: !!p.saldoPago });
+    return evs;
+  }
+  // parcelado
+  const n = Math.max(1, parseInt(p.numParcelas)||1);
+  const valorParcela = total / n;
+  const base = p.dataInicioParcelas;
+  if(!base) return [];
+  const evs = [];
+  for(let i=0;i<n;i++){
+    evs.push({ valor: valorParcela, date: addMonths(base,i), pago: i < (p.parcelasPagas||0) });
+  }
+  return evs;
+}
+function allPaymentEvents(){
+  return state.obras.flatMap(o => obraPaymentEvents(o));
+}
+function ensureObraDraft(){
+  const ed = state.editing.obras;
+  const o = ed ? state.obras.find(x=>x.id===ed) : null;
+  const defaultPagamento = { tipo:'avista', pago:false, dataPagamento:'', entradaPercentual:50, entradaPaga:false, dataEntrada:'', saldoPago:false, dataSaldo:'', numParcelas:2, parcelasPagas:0, dataInicioParcelas:'' };
+  if(o){
+    state.obraDraft = JSON.parse(JSON.stringify(o));
+    if(!state.obraDraft.equipe) state.obraDraft.equipe = [];
+    if(!state.obraDraft.itens) state.obraDraft.itens = [];
+    if(!state.obraDraft.pagamento) state.obraDraft.pagamento = { ...defaultPagamento };
+    else state.obraDraft.pagamento = { ...defaultPagamento, ...state.obraDraft.pagamento };
+  }else if(!state.obraDraft){
+    state.obraDraft = {
+      cliente:'', endereco:'', status:'Orçamento', dataInicio:'', dataFim:'',
+      itens: [], equipe: [],
+      pagamento: { ...defaultPagamento },
+    };
+  }
+}
+
+function calcValorTotal(d){
+  return (d.itens||[]).reduce((s,it)=> s + (Number(it.m2)||0)*(Number(it.valorM2)||0), 0);
+}
+
+function itensRowsHtml(){
+  const d = state.obraDraft;
+  if(!d.itens.length) return `<div style="font-size:12px;color:var(--ink-soft);margin-bottom:8px;">Nenhum serviço adicionado ainda.</div>`;
+  return d.itens.map((it,i)=>{
+    const subtotal = (Number(it.m2)||0)*(Number(it.valorM2)||0);
+    return `
+    <div class="item-row" data-idx="${i}">
+      <select class="item-servico" data-idx="${i}">
+        <option value="">Selecione o serviço</option>
+        ${state.servicos.map(s=>`<option value="${s.id}" ${it.servicoId===s.id?'selected':''}>${s.nome}</option>`).join("")}
+      </select>
+      <input class="item-m2" data-idx="${i}" type="number" step="0.01" placeholder="m²" value="${it.m2||''}" />
+      <input class="item-valorm2" data-idx="${i}" type="number" step="0.01" placeholder="R$/m²" value="${it.valorM2||''}" />
+      <span class="item-subtotal" data-idx="${i}" style="font-size:13px;font-weight:700;color:var(--moss-dark);white-space:nowrap;">${fmtMoney(subtotal)}</span>
+      <button type="button" class="link-btn item-remove" data-idx="${i}" style="color:var(--danger)">remover</button>
+    </div>`;
+  }).join("");
+}
+
+function equipeRowsHtml(){
+  const d = state.obraDraft;
+  if(!d.equipe.length) return `<div style="font-size:12px;color:var(--ink-soft);margin-bottom:8px;">Nenhum funcionário adicionado a esta obra ainda.</div>`;
+  return d.equipe.map((eq,i)=>`
+    <div class="equipe-row" data-idx="${i}">
+      <select class="eq-func" data-idx="${i}">
+        <option value="">Selecione o funcionário</option>
+        ${state.funcionarios.map(f=>`<option value="${f.id}" ${eq.funcionarioId===f.id?'selected':''}>${f.nome}</option>`).join("")}
+      </select>
+      <input class="eq-valor" data-idx="${i}" type="number" step="0.01" placeholder="R$/m²" value="${eq.valorM2||''}" />
+      <button type="button" class="link-btn eq-remove" data-idx="${i}" style="color:var(--danger)">remover</button>
+    </div>
+  `).join("");
+}
+
+function pagamentoFieldsHtml(){
+  const p = state.obraDraft.pagamento;
+  const total = calcValorTotal(state.obraDraft);
+  if(p.tipo==="avista"){
+    return `
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink);text-transform:none;margin-bottom:8px;">
+        <input type="checkbox" id="pg-pago" ${p.pago?'checked':''}/> Pagamento recebido (${fmtMoney(total)})
+      </label>
+      <div style="max-width:220px;">
+        <label>Data do pagamento (recebido ou previsto)</label>
+        <input id="pg-data-pagamento" type="date" value="${p.dataPagamento||''}" />
+      </div>`;
+  }
+  if(p.tipo==="entrada_saldo"){
+    const entrada = total * (Number(p.entradaPercentual)||0) / 100;
+    const saldo = total - entrada;
+    return `
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;">
+        <div>
+          <label>% de entrada</label>
+          <input id="pg-percentual" type="number" min="0" max="100" step="1" value="${p.entradaPercentual}" />
+        </div>
+        <div>
+          <label>Entrada</label>
+          <div style="padding:8px 0;font-weight:700;">${fmtMoney(entrada)}</div>
+        </div>
+        <div>
+          <label>Saldo na conclusão</label>
+          <div style="padding:8px 0;font-weight:700;">${fmtMoney(saldo)}</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:8px;">
+        <div>
+          <label style="display:flex;align-items:center;gap:6px;text-transform:none;">
+            <input type="checkbox" id="pg-entrada-paga" ${p.entradaPaga?'checked':''}/> Entrada recebida
+          </label>
+          <input id="pg-data-entrada" type="date" value="${p.dataEntrada||''}" />
+        </div>
+        <div>
+          <label style="display:flex;align-items:center;gap:6px;text-transform:none;">
+            <input type="checkbox" id="pg-saldo-pago" ${p.saldoPago?'checked':''}/> Saldo recebido
+          </label>
+          <input id="pg-data-saldo" type="date" value="${p.dataSaldo||''}" />
+        </div>
+      </div>`;
+  }
+  // parcelado
+  const n = Math.max(1, parseInt(p.numParcelas)||1);
+  const valorParcela = total / n;
+  return `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;">
+      <div>
+        <label>Número de parcelas</label>
+        <input id="pg-num-parcelas" type="number" min="1" step="1" value="${p.numParcelas}" />
+      </div>
+      <div>
+        <label>Valor de cada parcela</label>
+        <div style="padding:8px 0;font-weight:700;">${fmtMoney(valorParcela)}</div>
+      </div>
+      <div>
+        <label>Parcelas já recebidas</label>
+        <input id="pg-parcelas-pagas" type="number" min="0" max="${n}" step="1" value="${p.parcelasPagas}" />
+      </div>
+      <div>
+        <label>Data da 1ª parcela</label>
+        <input id="pg-data-inicio-parcelas" type="date" value="${p.dataInicioParcelas||''}" />
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--ink-soft);margin-top:6px;">As parcelas seguintes são projetadas mensalmente a partir dessa data.</div>`;
+}
+
+function refreshComputedDisplays(){
+  const d = state.obraDraft;
+  const total = calcValorTotal(d);
+  const disp = document.getElementById("valor-total-display");
+  if(disp) disp.textContent = fmtMoney(total);
+  const pf = document.getElementById("pagamento-fields");
+  if(pf){ pf.innerHTML = pagamentoFieldsHtml(); attachPagamentoHandlers(); }
+}
+
+function obraFormHtml(){
+  ensureObraDraft();
+  const d = state.obraDraft;
+  return `
+    <form class="inline" id="form-obra">
+      <div>
+        <label>Cliente</label>
+        <input name="cliente" id="obra-cliente" required value="${d.cliente||''}" />
+      </div>
+      <div class="full">
+        <label>Endereço</label>
+        <input name="endereco" id="obra-endereco" value="${d.endereco||''}" />
+      </div>
+
+      <div class="equipe-box">
+        <div class="title">Serviços incluídos nesta obra</div>
+        <div id="itens-rows">${itensRowsHtml()}</div>
+        <button type="button" class="btn btn-ghost btn-sm" id="add-item-row">+ Adicionar serviço</button>
+      </div>
+
+      <div class="valor-total-box">
+        <span>Valor total da obra (soma dos serviços)</span>
+        <span class="amount" id="valor-total-display">${fmtMoney(calcValorTotal(d))}</span>
+      </div>
+
+      <div class="equipe-box">
+        <div class="title">Forma de pagamento</div>
+        <select id="obra-pagamento-tipo" style="margin-bottom:10px;">
+          <option value="avista" ${d.pagamento.tipo==='avista'?'selected':''}>À vista</option>
+          <option value="entrada_saldo" ${d.pagamento.tipo==='entrada_saldo'?'selected':''}>Entrada + saldo na conclusão</option>
+          <option value="parcelado" ${d.pagamento.tipo==='parcelado'?'selected':''}>Parcelado</option>
+        </select>
+        <div id="pagamento-fields">${pagamentoFieldsHtml()}</div>
+      </div>
+
+      <div class="equipe-box">
+        <div class="title">Funcionários que vão executar + valor por m² de cada</div>
+        <div id="equipe-rows">${equipeRowsHtml()}</div>
+        <button type="button" class="btn btn-ghost btn-sm" id="add-equipe-row">+ Adicionar funcionário à obra</button>
+      </div>
+
+      <div>
+        <label>Status</label>
+        <select name="status" id="obra-status">
+          <option ${d.status==='Orçamento'?'selected':''}>Orçamento</option>
+          <option ${d.status==='Em andamento'?'selected':''}>Em andamento</option>
+          <option ${d.status==='Concluída'?'selected':''}>Concluída</option>
+        </select>
+      </div>
+      <div>
+        <label>Data de início</label>
+        <input name="dataInicio" id="obra-inicio" type="date" value="${d.dataInicio||''}" />
+      </div>
+      <div>
+        <label>Previsão de conclusão</label>
+        <input name="dataFim" id="obra-fim" type="date" value="${d.dataFim||''}" />
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="btn btn-primary">${state.editing.obras?'Salvar alterações':'Adicionar obra'}</button>
+        <button type="button" class="btn btn-ghost" id="cancel-obra">Cancelar</button>
+      </div>
+    </form>
+  `;
+}
+function renderObras(){
+  return `
+    <section class="panel">
+      <h2>Obras
+        ${!state.formOpen.obras ? `<button class="btn btn-primary btn-sm" id="add-obra">+ Adicionar obra</button>` : ''}
+      </h2>
+      ${obrasTableHtml()}
+      ${state.formOpen.obras ? obraFormHtml() : ''}
+    </section>
+  `;
+}
+
+// ---------- AGENDA ----------
+function agendaItemHtml(a){
+  const d = new Date(a.data+"T00:00:00");
+  const obra = state.obras.find(o=>o.id===a.obraId);
+  return `
+    <div class="agenda-item" data-id="${a.id}">
+      <div class="agenda-date">
+        <div class="d">${d.getDate()}</div>
+        <div class="m">${monthsPt[d.getMonth()]}</div>
+      </div>
+      <div class="agenda-body">
+        <div class="t">${a.titulo}</div>
+        <div class="meta">${a.tipo}${a.hora? ' · '+a.hora : ''}${obra? ' · '+obra.cliente : ''}</div>
+      </div>
+      <div class="row-actions">
+        <button class="link-btn" data-action="edit-agenda" data-id="${a.id}">editar</button>
+        <button class="link-btn" data-action="del-agenda" data-id="${a.id}" style="color:var(--danger)">remover</button>
+      </div>
+    </div>
+  `;
+}
+function agendaListHtml(){
+  if(!state.agenda.length) return `<div class="empty">Nenhum compromisso cadastrado ainda.</div>`;
+  const ordered = [...state.agenda].sort((a,b)=> new Date(a.data+"T"+(a.hora||"00:00")) - new Date(b.data+"T"+(b.hora||"00:00")));
+  return ordered.map(a=>agendaItemHtml(a)).join("");
+}
+function agendaFormHtml(){
+  const ed = state.editing.agenda;
+  const a = ed ? state.agenda.find(x=>x.id===ed) : null;
+  const obraOptions = state.obras.map(o=>`<option value="${o.id}" ${a&&a.obraId===o.id?'selected':''}>${o.cliente}</option>`).join("");
+  return `
+    <form class="inline" id="form-agenda">
+      <div class="full">
+        <label>Título</label>
+        <input name="titulo" required value="${a?a.titulo:''}" />
+      </div>
+      <div>
+        <label>Data</label>
+        <input name="data" type="date" required value="${a?a.data:''}" />
+      </div>
+      <div>
+        <label>Hora</label>
+        <input name="hora" type="time" value="${a?(a.hora||''):''}" />
+      </div>
+      <div>
+        <label>Tipo</label>
+        <select name="tipo">
+          <option ${a&&a.tipo==='Visita'?'selected':''}>Visita</option>
+          <option ${a&&a.tipo==='Instalação'?'selected':''}>Instalação</option>
+          <option ${a&&a.tipo==='Reunião'?'selected':''}>Reunião</option>
+          <option ${a&&a.tipo==='Entrega'?'selected':''}>Entrega</option>
+          <option ${a&&a.tipo==='Outro'?'selected':''}>Outro</option>
+        </select>
+      </div>
+      <div>
+        <label>Obra relacionada (opcional)</label>
+        <select name="obraId">
+          <option value="">—</option>
+          ${obraOptions}
+        </select>
+      </div>
+      <div class="actions">
+        <button type="submit" class="btn btn-primary">${a?'Salvar alterações':'Adicionar evento'}</button>
+        <button type="button" class="btn btn-ghost" id="cancel-agenda">Cancelar</button>
+      </div>
+    </form>
+  `;
+}
+function renderAgenda(){
+  return `
+    <section class="panel">
+      <h2>Agenda
+        ${!state.formOpen.agenda ? `<button class="btn btn-primary btn-sm" id="add-agenda">+ Adicionar evento</button>` : ''}
+      </h2>
+      ${agendaListHtml()}
+      ${state.formOpen.agenda ? agendaFormHtml() : ''}
+    </section>
+  `;
+}
+
+// ---------- MAIN RENDER ----------
+function render(){
+  renderTabs();
+  const el = document.getElementById("content");
+  if(state.loading){
+    el.innerHTML = `<div class="empty">Carregando…</div>`;
+    return;
+  }
+  if(state.activeTab==="resumo") el.innerHTML = renderResumo();
+  else if(state.activeTab==="funcionarios") el.innerHTML = renderFuncionarios();
+  else if(state.activeTab==="servicos") el.innerHTML = renderServicos();
+  else if(state.activeTab==="obras") el.innerHTML = renderObras();
+  else if(state.activeTab==="agenda") el.innerHTML = renderAgenda();
+  el.innerHTML += `<div class="footer-note">Dados salvos automaticamente neste dispositivo.</div>`;
+  attachHandlers();
+}
+
+function attachHandlers(){
+  // Funcionários
+  const addFunc = document.getElementById("add-func");
+  if(addFunc) addFunc.addEventListener("click", ()=>{ state.editing.funcionarios=null; state.formOpen.funcionarios=true; render(); });
+  const cancelFunc = document.getElementById("cancel-func");
+  if(cancelFunc) cancelFunc.addEventListener("click", ()=>{ state.formOpen.funcionarios=false; state.editing.funcionarios=null; render(); });
+  const formFunc = document.getElementById("form-func");
+  if(formFunc) formFunc.addEventListener("submit", async (e)=>{
+    e.preventDefault();
+    const fd = new FormData(formFunc);
+    const data = { nome: fd.get("nome"), tipo: fd.get("tipo"), valor: parseNum(fd.get("valor")), status: fd.get("status"), obs: fd.get("obs") };
+    if(state.editing.funcionarios){
+      const idx = state.funcionarios.findIndex(x=>x.id===state.editing.funcionarios);
+      state.funcionarios[idx] = { ...state.funcionarios[idx], ...data };
+    }else{
+      state.funcionarios.push({ id: uid(), ...data });
+    }
+    const ok = await saveList(KEYS.funcionarios, state.funcionarios);
+    if(ok) showToast("Funcionário salvo.");
+    state.formOpen.funcionarios=false; state.editing.funcionarios=null;
+    render();
+  });
+  document.querySelectorAll('[data-action="edit-func"]').forEach(b=>{
+    b.addEventListener("click", ()=>{ state.editing.funcionarios=b.dataset.id; state.formOpen.funcionarios=true; render(); });
+  });
+  document.querySelectorAll('[data-action="del-func"]').forEach(b=>{
+    b.addEventListener("click", async ()=>{
+      state.funcionarios = state.funcionarios.filter(x=>x.id!==b.dataset.id);
+      await saveList(KEYS.funcionarios, state.funcionarios);
+      showToast("Removido.");
+      render();
+    });
+  });
+
+  // Serviços
+  const addServico = document.getElementById("add-servico");
+  if(addServico) addServico.addEventListener("click", ()=>{ state.editing.servicos=null; state.formOpen.servicos=true; render(); });
+  const cancelServico = document.getElementById("cancel-servico");
+  if(cancelServico) cancelServico.addEventListener("click", ()=>{ state.formOpen.servicos=false; state.editing.servicos=null; render(); });
+  const formServico = document.getElementById("form-servico");
+  if(formServico) formServico.addEventListener("submit", async (e)=>{
+    e.preventDefault();
+    const fd = new FormData(formServico);
+    const data = { nome: fd.get("nome"), valorM2: parseNum(fd.get("valorM2")) };
+    if(state.editing.servicos){
+      const idx = state.servicos.findIndex(x=>x.id===state.editing.servicos);
+      state.servicos[idx] = { ...state.servicos[idx], ...data };
+    }else{
+      state.servicos.push({ id: uid(), ...data });
+    }
+    const ok = await saveList(KEYS.servicos, state.servicos);
+    if(ok) showToast("Serviço salvo.");
+    state.formOpen.servicos=false; state.editing.servicos=null;
+    render();
+  });
+  document.querySelectorAll('[data-action="edit-servico"]').forEach(b=>{
+    b.addEventListener("click", ()=>{ state.editing.servicos=b.dataset.id; state.formOpen.servicos=true; render(); });
+  });
+  document.querySelectorAll('[data-action="del-servico"]').forEach(b=>{
+    b.addEventListener("click", async ()=>{
+      state.servicos = state.servicos.filter(x=>x.id!==b.dataset.id);
+      await saveList(KEYS.servicos, state.servicos);
+      showToast("Removido.");
+      render();
+    });
+  });
+
+  // Obras
+  const addObra = document.getElementById("add-obra");
+  if(addObra) addObra.addEventListener("click", ()=>{ state.editing.obras=null; state.obraDraft=null; state.formOpen.obras=true; render(); });
+  const cancelObra = document.getElementById("cancel-obra");
+  if(cancelObra) cancelObra.addEventListener("click", ()=>{ state.formOpen.obras=false; state.editing.obras=null; state.obraDraft=null; render(); });
+
+  const obraCliente = document.getElementById("obra-cliente");
+  if(obraCliente) obraCliente.addEventListener("input", ()=>{ state.obraDraft.cliente = obraCliente.value; });
+  const obraEndereco = document.getElementById("obra-endereco");
+  if(obraEndereco) obraEndereco.addEventListener("input", ()=>{ state.obraDraft.endereco = obraEndereco.value; });
+  const obraStatus = document.getElementById("obra-status");
+  if(obraStatus) obraStatus.addEventListener("change", ()=>{ state.obraDraft.status = obraStatus.value; });
+  const obraInicio = document.getElementById("obra-inicio");
+  if(obraInicio) obraInicio.addEventListener("change", ()=>{ state.obraDraft.dataInicio = obraInicio.value; });
+  const obraFim = document.getElementById("obra-fim");
+  if(obraFim) obraFim.addEventListener("change", ()=>{ state.obraDraft.dataFim = obraFim.value; });
+
+  // Itens de serviço (múltiplos serviços por obra)
+  const addItemRow = document.getElementById("add-item-row");
+  if(addItemRow) addItemRow.addEventListener("click", ()=>{
+    state.obraDraft.itens.push({ servicoId:'', m2:0, valorM2:0 });
+    document.getElementById("itens-rows").innerHTML = itensRowsHtml();
+    attachItemRowHandlers();
+    refreshComputedDisplays();
+  });
+  attachItemRowHandlers();
+  function attachItemRowHandlers(){
+    document.querySelectorAll(".item-servico").forEach(sel=>{
+      sel.addEventListener("change", ()=>{
+        const idx = sel.dataset.idx;
+        state.obraDraft.itens[idx].servicoId = sel.value;
+        const serv = state.servicos.find(s=>s.id===sel.value);
+        if(serv){
+          state.obraDraft.itens[idx].valorM2 = serv.valorM2;
+          const row = sel.closest(".item-row");
+          const valInput = row.querySelector(".item-valorm2");
+          if(valInput) valInput.value = serv.valorM2;
+          const subtotalSpan = row.querySelector(".item-subtotal");
+          if(subtotalSpan) subtotalSpan.textContent = fmtMoney((Number(state.obraDraft.itens[idx].m2)||0)*serv.valorM2);
+        }
+        refreshComputedDisplays();
+      });
+    });
+    document.querySelectorAll(".item-m2").forEach(inp=>{
+      inp.addEventListener("input", ()=>{
+        const idx = inp.dataset.idx;
+        state.obraDraft.itens[idx].m2 = parseFloat(inp.value)||0;
+        const row = inp.closest(".item-row");
+        const subtotalSpan = row.querySelector(".item-subtotal");
+        if(subtotalSpan) subtotalSpan.textContent = fmtMoney((Number(state.obraDraft.itens[idx].m2)||0)*(Number(state.obraDraft.itens[idx].valorM2)||0));
+        refreshComputedDisplays();
+      });
+    });
+    document.querySelectorAll(".item-valorm2").forEach(inp=>{
+      inp.addEventListener("input", ()=>{
+        const idx = inp.dataset.idx;
+        state.obraDraft.itens[idx].valorM2 = parseFloat(inp.value)||0;
+        const row = inp.closest(".item-row");
+        const subtotalSpan = row.querySelector(".item-subtotal");
+        if(subtotalSpan) subtotalSpan.textContent = fmtMoney((Number(state.obraDraft.itens[idx].m2)||0)*(Number(state.obraDraft.itens[idx].valorM2)||0));
+        refreshComputedDisplays();
+      });
+    });
+    document.querySelectorAll(".item-remove").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        state.obraDraft.itens.splice(parseInt(btn.dataset.idx),1);
+        document.getElementById("itens-rows").innerHTML = itensRowsHtml();
+        attachItemRowHandlers();
+        refreshComputedDisplays();
+      });
+    });
+  }
+
+  // Forma de pagamento
+  const pagamentoTipo = document.getElementById("obra-pagamento-tipo");
+  if(pagamentoTipo) pagamentoTipo.addEventListener("change", ()=>{
+    state.obraDraft.pagamento.tipo = pagamentoTipo.value;
+    document.getElementById("pagamento-fields").innerHTML = pagamentoFieldsHtml();
+    attachPagamentoHandlers();
+  });
+  attachPagamentoHandlers();
+  function attachPagamentoHandlers(){
+    const p = state.obraDraft.pagamento;
+    const pgPago = document.getElementById("pg-pago");
+    if(pgPago) pgPago.addEventListener("change", ()=>{ p.pago = pgPago.checked; });
+    const pgDataPagamento = document.getElementById("pg-data-pagamento");
+    if(pgDataPagamento) pgDataPagamento.addEventListener("change", ()=>{ p.dataPagamento = pgDataPagamento.value; });
+    const pgPercentual = document.getElementById("pg-percentual");
+    if(pgPercentual) pgPercentual.addEventListener("input", ()=>{
+      p.entradaPercentual = parseFloat(pgPercentual.value)||0;
+      document.getElementById("pagamento-fields").innerHTML = pagamentoFieldsHtml();
+      attachPagamentoHandlers();
+    });
+    const pgEntradaPaga = document.getElementById("pg-entrada-paga");
+    if(pgEntradaPaga) pgEntradaPaga.addEventListener("change", ()=>{ p.entradaPaga = pgEntradaPaga.checked; });
+    const pgDataEntrada = document.getElementById("pg-data-entrada");
+    if(pgDataEntrada) pgDataEntrada.addEventListener("change", ()=>{ p.dataEntrada = pgDataEntrada.value; });
+    const pgSaldoPago = document.getElementById("pg-saldo-pago");
+    if(pgSaldoPago) pgSaldoPago.addEventListener("change", ()=>{ p.saldoPago = pgSaldoPago.checked; });
+    const pgDataSaldo = document.getElementById("pg-data-saldo");
+    if(pgDataSaldo) pgDataSaldo.addEventListener("change", ()=>{ p.dataSaldo = pgDataSaldo.value; });
+    const pgNumParcelas = document.getElementById("pg-num-parcelas");
+    if(pgNumParcelas) pgNumParcelas.addEventListener("input", ()=>{
+      p.numParcelas = parseInt(pgNumParcelas.value)||1;
+      document.getElementById("pagamento-fields").innerHTML = pagamentoFieldsHtml();
+      attachPagamentoHandlers();
+    });
+    const pgParcelasPagas = document.getElementById("pg-parcelas-pagas");
+    if(pgParcelasPagas) pgParcelasPagas.addEventListener("input", ()=>{ p.parcelasPagas = parseInt(pgParcelasPagas.value)||0; });
+    const pgDataInicioParcelas = document.getElementById("pg-data-inicio-parcelas");
+    if(pgDataInicioParcelas) pgDataInicioParcelas.addEventListener("change", ()=>{ p.dataInicioParcelas = pgDataInicioParcelas.value; });
+  }
+
+  // Equipe
+  const addEquipeRow = document.getElementById("add-equipe-row");
+  if(addEquipeRow) addEquipeRow.addEventListener("click", ()=>{
+    state.obraDraft.equipe.push({ funcionarioId:'', valorM2:0 });
+    document.getElementById("equipe-rows").innerHTML = equipeRowsHtml();
+    attachEquipeRowHandlers();
+  });
+  attachEquipeRowHandlers();
+
+  function attachEquipeRowHandlers(){
+    document.querySelectorAll(".eq-func").forEach(sel=>{
+      sel.addEventListener("change", ()=>{ state.obraDraft.equipe[sel.dataset.idx].funcionarioId = sel.value; });
+    });
+    document.querySelectorAll(".eq-valor").forEach(inp=>{
+      inp.addEventListener("input", ()=>{ state.obraDraft.equipe[inp.dataset.idx].valorM2 = parseFloat(inp.value)||0; });
+    });
+    document.querySelectorAll(".eq-remove").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        state.obraDraft.equipe.splice(parseInt(btn.dataset.idx),1);
+        document.getElementById("equipe-rows").innerHTML = equipeRowsHtml();
+        attachEquipeRowHandlers();
+      });
+    });
+  }
+
+  const formObra = document.getElementById("form-obra");
+  if(formObra) formObra.addEventListener("submit", async (e)=>{
+    e.preventDefault();
+    const d = state.obraDraft;
+    if(!d.cliente){ showToast("Informe o cliente."); return; }
+    d.itens = d.itens.filter(it=>it.servicoId);
+    d.valorTotal = calcValorTotal(d);
+    d.equipe = d.equipe.filter(eq=>eq.funcionarioId);
+    if(state.editing.obras){
+      const idx = state.obras.findIndex(x=>x.id===state.editing.obras);
+      state.obras[idx] = { ...state.obras[idx], ...d, id: state.editing.obras };
+    }else{
+      state.obras.push({ id: uid(), ...d });
+    }
+    const ok = await saveList(KEYS.obras, state.obras);
+    if(ok) showToast("Obra salva.");
+    state.formOpen.obras=false; state.editing.obras=null; state.obraDraft=null;
+    render();
+  });
+  document.querySelectorAll('[data-action="edit-obra"]').forEach(b=>{
+    b.addEventListener("click", ()=>{ state.editing.obras=b.dataset.id; state.obraDraft=null; state.formOpen.obras=true; render(); });
+  });
+  document.querySelectorAll('[data-action="del-obra"]').forEach(b=>{
+    b.addEventListener("click", async ()=>{
+      state.obras = state.obras.filter(x=>x.id!==b.dataset.id);
+      await saveList(KEYS.obras, state.obras);
+      showToast("Removida.");
+      render();
+    });
+  });
+
+  // Agenda
+  const addAgenda = document.getElementById("add-agenda");
+  if(addAgenda) addAgenda.addEventListener("click", ()=>{ state.editing.agenda=null; state.formOpen.agenda=true; render(); });
+  const cancelAgenda = document.getElementById("cancel-agenda");
+  if(cancelAgenda) cancelAgenda.addEventListener("click", ()=>{ state.formOpen.agenda=false; state.editing.agenda=null; render(); });
+  const formAgenda = document.getElementById("form-agenda");
+  if(formAgenda) formAgenda.addEventListener("submit", async (e)=>{
+    e.preventDefault();
+    const fd = new FormData(formAgenda);
+    const data = {
+      titulo: fd.get("titulo"), data: fd.get("data"), hora: fd.get("hora"),
+      tipo: fd.get("tipo"), obraId: fd.get("obraId")||null,
+    };
+    if(state.editing.agenda){
+      const idx = state.agenda.findIndex(x=>x.id===state.editing.agenda);
+      state.agenda[idx] = { ...state.agenda[idx], ...data };
+    }else{
+      state.agenda.push({ id: uid(), ...data });
+    }
+    const ok = await saveList(KEYS.agenda, state.agenda);
+    if(ok) showToast("Evento salvo.");
+    state.formOpen.agenda=false; state.editing.agenda=null;
+    render();
+  });
+  document.querySelectorAll('[data-action="edit-agenda"]').forEach(b=>{
+    b.addEventListener("click", ()=>{ state.editing.agenda=b.dataset.id; state.formOpen.agenda=true; render(); });
+  });
+  document.querySelectorAll('[data-action="del-agenda"]').forEach(b=>{
+    b.addEventListener("click", async ()=>{
+      state.agenda = state.agenda.filter(x=>x.id!==b.dataset.id);
+      await saveList(KEYS.agenda, state.agenda);
+      showToast("Removido.");
+      render();
+    });
+  });
+}
+
+init();
+
+if("serviceWorker" in navigator){
+  window.addEventListener("load", ()=>{
+    navigator.serviceWorker.register("sw.js").catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>
